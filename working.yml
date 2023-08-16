@@ -1,0 +1,9 @@
+#After CHanging WinRM port to http - This is better and recognizing
+- name: Apply DFS Namespace Configuration
+  ansible.windows.win_dsc:
+    resource_name: DFSNamespaceRoot
+    Path: '\\win.mykronos.com\testnamespc20'
+    TargetPath: '\\win-dfs01.int.oss.mykronos.com\testnamespc20'
+    Ensure: 'Present'
+    Type: 'DomainV2'
+    Description: 'AD Domain based DFS namespace for storing software installers'
