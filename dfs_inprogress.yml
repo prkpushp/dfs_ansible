@@ -1,0 +1,49 @@
+- name: Configure DFS Cluster
+  hosts: dfs_nodes
+  gather_facts: false
+  vars:
+    replicationGroupName: repgrp17
+    domainName: win.mykronos.com
+    topologyType: FullMesh
+    primaryMember: WIN-DFS01
+    folderName: p19-app
+    namespace: testnamespc20
+    node1: WIN-DFS01
+    node2: WIN-DFS02
+    node3: WIN-DFS03
+    dnssuffix: int.oss.mykronos.com
+  tasks:
+  - name: Install File Server role and DFS Replication feature
+    win_feature:
+      name: '{{ item }}'
+      state: present
+    loop:
+    - fs-fileserver
+    #- fs-dfs-namespace
+  - name: Create C DFSRRoot Namespace
+    #- FS-DFS-Replication
+    win_file:
+      path: C:\DFSRoots\{{ namespace }}
+      state: directory
+
+  - name: Create SMB Namespace
+    win_share:
+      name: "{{ namespace }}"
+      path: C:\DFSRoots\{{ namespace }}
+      description: "DFS Root for {{ namespace }}"
+      state: present
+
+  - name: CreateDFSNRoot win\share
+    raw: powershell C:\test.ps1
+
+  - name: Create C  foldername (p07-app)
+    win_file:
+      path: C:\DFSRoots\{{ folderName }}
+      state: directory
+
+  - name: Create SMB foldername (C:\p07-app)
+    win_share:
+      name: "{{ foldername }}"
+      path: C:\{{ foldername }}
+      description: "DFS  for {{ foldername }}"
+      state: present

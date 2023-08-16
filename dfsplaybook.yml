@@ -1,0 +1,25 @@
+- name: Configure DFS Cluster
+  hosts: dfs_nodes
+  gather_facts: false
+  vars:
+    replicationGroupName: repgrp17
+    domainName: win.mykronos.com
+    topologyType: FullMesh
+    primaryMember: WIN-DFS01
+    folderName: p17-app
+    namespace: testnamespc17
+    node1: WIN-DFS01
+    node2: WIN-DFS02
+    node3: WIN-DFS03
+    dnssuffix: int.oss.mykronos.com
+  tasks:
+  - name: Install File Server role and DFS Replication feature
+    win_feature:
+      name: '{{ item }}'
+      state: present
+    loop:
+    - fs-fileserver
+    #- fs-dfs-namespace
+  - name: Create Namescape
+    #- FS-DFS-Replication
+    win_shell: Import-Module DFSR; New-Item -ItemType Directory -Path "C:\DFSRoots\{{ namespace }}"; New-SmbShare -Name "{{ namespace }}" -Path "C:\DFSRoots\{{ namespace }}" -FullAccess "Everyone"; New-DfsnRoot -TargetPath "\\{{ node1 }}.{{ dnssuffix }}\{{ namespace }}" -Type DomainV2 -Path "\\{{ domainName }}\{{ namespace }}" mkdir "C:\{{ folderName }}"; New-SmbShare –Name "{{ folderName }}" –Path "C:\{{ folderName }}" -FullAccess "Everyone"; New-DfsnFolder -Path "\\{{ domainName }}\{ namespace }\{ folderName }" -TargetPath "\\{{ node1 }}\{{ folderName }}" -EnableTargetFailback $True
