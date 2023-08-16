@@ -11,7 +11,10 @@ $node2 = "WIN-DFS02"
 $node3 = "WIN-DFS03"
 $dnssuffix = "int.oss.mykronos.com"
 
-Install-windowsfeature FS-DFS-Namespace, FS-DFS-Replication -IncludeManagementTools -restart
+foreach ($server in $serverNames) {
+    Install-windowsfeature FS-DFS-Namespace, FS-DFS-Replication -IncludeManagementTools -restart
+}
+
 New-Item -ItemType Directory -Path "C:\DFSRoots\$namespace" 
 New-SmbShare -Name "$namespace" -Path "C:\DFSRoots\$namespace" -FullAccess "Everyone"
 New-DfsnRoot -TargetPath "\\$node1.$dnssuffix\$namespace" -Type DomainV2 -Path "\\$domainName\$namespace" 
