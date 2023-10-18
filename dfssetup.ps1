@@ -13,6 +13,7 @@ $node2 = "WIN-DFS02"
 $node3 = "WIN-DFS03"
 $dnssuffix = "win.techstuffs.com"
 
+
 foreach ($server in $serverNames) {
     Install-windowsfeature FS-DFS-Namespace, FS-DFS-Replication -IncludeManagementTools -restart
     $userName = "NewUserew1234"           # Replace with the desired username
