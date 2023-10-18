@@ -1,6 +1,8 @@
+# Respective DFS Powershell Script
+
 Import-Module DFSR
 $replicationGroupName = "repgrp09"
-$domainName = "win.mykronos.com"
+$domainName = "win.techstuffs.com"
 $serverNames = "WIN-DFS01", "WIN-DFS02", "WIN-DFS03"
 $topologyType = "FullMesh"
 $primaryMember = "WIN-DFS01"
@@ -9,7 +11,7 @@ $namespace="testnamespc09"
 $node1 = "WIN-DFS01"
 $node2 = "WIN-DFS02"
 $node3 = "WIN-DFS03"
-$dnssuffix = "int.oss.mykronos.com"
+$dnssuffix = "win.techstuffs.com"
 
 foreach ($server in $serverNames) {
     Install-windowsfeature FS-DFS-Namespace, FS-DFS-Replication -IncludeManagementTools -restart

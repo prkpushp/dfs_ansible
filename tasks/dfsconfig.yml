@@ -1,0 +1,74 @@
+---
+- name: CreateDFSNRoot win\share
+  win_dsc:
+    resource_name: DFSNamespaceRoot
+    Path: '\\{{ domainName }}\{{ namespace }}'
+    TargetPath: '\\{{ node1 }}.{{ dnssuffix }}\{{ namespace }}'
+    Ensure: Present
+    Type: DomainV2
+    EnableTargetFailback: True
+    PsDscRunAsCredential_username: '{{ansible_user}}'
+    PsDscRunAsCredential_password: '{{ansible_password}}'
+
+- name: Create DFSNFolder
+  win_dsc:
+    resource_name: DFSNamespaceFolder
+    Path: '\\{{ domainName }}\{{ namespace }}\{{ folderName }}'
+    TargetPath: '\\{{ node1 }}\{{ folderName }}'
+    EnableTargetFailback: True
+    Ensure: Present
+    PsDscRunAsCredential_username: '{{ansible_user}}'
+    PsDscRunAsCredential_password: '{{ansible_password}}'
+
+- name: Create New DFSReplication Group and Add Dfrs Members
+  win_dsc:
+    resource_name: DFSReplicationGroup
+    GroupName: '{{ replicationGroupName }}'
+    Ensure: Present
+    Members: '{{ node1 }},{{ node2 }},{{ node3 }}'
+    Folders: '{{ folderName }}'
+    Topology: '{{ topologyType }}'
+    PsDscRunAsCredential_username: '{{ansible_user}}'
+    PsDscRunAsCredential_password: '{{ansible_password}}'
+  ignore_errors: true
+
+- name: Add Dfrs Connection
+  win_dsc:
+    resource_name: DFSReplicationGroupConnection
+    DestinationComputerName: '{{ item.DCName }}'
+    GroupName: '{{ replicationGroupName }}'
+    SourceComputerName: '{{ item.SCName }}'
+    Ensure: present
+    PsDscRunAsCredential_username: '{{ansible_user}}'
+    PsDscRunAsCredential_password: '{{ansible_password}}'
+  loop:
+    - { DCName: '{{ node2 }}', SCName:  '{{ node1 }}' }
+    - { DCName: '{{ node3 }}', SCName:  '{{ node1 }}' }
+    - { DCName: '{{ node3 }}', SCName:  '{{ node2 }}' }
+    - { DCName: '{{ node1 }}', SCName:  '{{ node2 }}' }
+    - { DCName: '{{ node1 }}', SCName:  '{{ node3 }}' }
+    - { DCName: '{{ node2 }}', SCName:  '{{ node3 }}' }
+
+- name: New DFS Replicated Folder
+  win_dsc:
+    resource_name: DFSReplicationGroupFolder
+    GroupName: '{{ replicationGroupName }}'
+    FolderName: '{{ folderName }}'
+    DfsnPath: '\\{{ domainName }}\{{ namespace }}\{{ folderName }}'
+    PsDscRunAsCredential_username: '{{ansible_user}}'
+    PsDscRunAsCredential_password: '{{ansible_password}}'
+
+- name: Set Dfrs Membership
+  win_dsc:
+    resource_name: DFSReplicationGroupMembership
+    GroupName: '{{ replicationGroupName }}'
+    FolderName: '{{ folderName }}'
+    ComputerName: '{{ item.CName }}'
+    ContentPath: 'D:\{{ folderName }}'
+    PrimaryMember: '{{ item.PMember }}'
+    PsDscRunAsCredential_username: '{{ansible_user}}'
+    PsDscRunAsCredential_password: '{{ansible_password}}'
+  loop:
+    - { CName: '{{ node1 }}', PMember:  True }
+    - { CName: '{{ node2 }}', PMember:  False }
+    - { CName: '{{ node3 }}', PMember:  False }
