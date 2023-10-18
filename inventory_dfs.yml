@@ -1,0 +1,14 @@
+[dfs_nodes]
+win-dfs01.win.techstuffs.com
+win-dfs02.win.techstuffs.com
+win-dfs03.win.techstuffs.com
+
+[dfs_primary]
+win-dfs01.win.techstuffs.com
+
+[dfs_nodes:vars]
+ansible_connection=winrm
+ansible_winrm_transport=https
+ansible_port=5986
+ansible_winrm_server_cert_validation=ignore
+ansible_winrm_transport=ntlm

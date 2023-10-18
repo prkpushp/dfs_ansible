@@ -1,0 +1,19 @@
+---
+- name: Create C DFSRRoot Namespace
+  win_file:
+    path: '{{ item }}'
+    state: directory
+  loop:
+    -  C:\DFSRoots\{{ namespace }}
+    -  D:\{{ folderName }}
+
+- name: Create SMB
+  win_share:
+    name: "{{ item.dfsname }}"
+    path: '{{ item.dfspath }}'
+    full: Everyone
+    description: "DFS Root for {{ item.dfsname }}"
+    list: true
+  loop:
+    - { dfsname: '{{ namespace }}', dfspath:  'C:\DFSRoots\{{ namespace }}' }
+    - { dfsname: '{{ folderName }}', dfspath:  'D:\{{ folderName }}' }

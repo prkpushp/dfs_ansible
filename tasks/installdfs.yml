@@ -1,0 +1,42 @@
+---
+- name: Create SQLAdmin User
+  win_user:
+    name: '{{ dbuser }}'
+    password: '{{ dbpass }}'
+    description: "SQL Service Account"
+    password_never_expires: true
+    state: present
+    groups:
+      - Administrators
+      - Users
+  delegate_to: "{{ item }}"
+  loop: "{{ groups['dfs_nodes'] }}"
+  ignore_errors: true
+
+- name: Install fs-fileserver feature
+  win_feature:
+    name: fs-fileserver
+    state: present
+  delegate_to: "{{ item }}"
+  loop: "{{ groups['dfs_nodes'] }}"
+
+- name: Install fs-dfs-namespace feature
+  win_feature:
+    name: fs-dfs-namespace
+    state: present
+  delegate_to: "{{ item }}"
+  loop: "{{ groups['dfs_nodes'] }}"
+
+- name: Install FS-DFS-Replication feature
+  win_feature:
+    name: FS-DFS-Replication
+    state: present
+  delegate_to: "{{ item }}"
+  loop: "{{ groups['dfs_nodes'] }}"
+
+- name: Install DFS-Management-Tools feature
+  win_feature:
+    name: RSAT-DFS-Mgmt-Con
+    state: present
+  delegate_to: "{{ item }}"
+  loop: "{{ groups['dfs_nodes'] }}"

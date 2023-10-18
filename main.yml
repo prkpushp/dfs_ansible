@@ -1,0 +1,16 @@
+---
+- name: Configure DFS Cluster
+  hosts: dfs_primary
+  gather_facts: false
+  become_method: runas
+  become: yes
+  become_user: '{{ ansible_user }}'
+  vars_files:
+    -   play_vars.yml
+    -   cred.yml
+  tasks:
+    - include_tasks: 'tasks/installdfs.yml'
+    
+    - include_tasks: 'tasks/directory.yml'
+
+    - include_tasks: 'tasks/dfsconfig.yml'
